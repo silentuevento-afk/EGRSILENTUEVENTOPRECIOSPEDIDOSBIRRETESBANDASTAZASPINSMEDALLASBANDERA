@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nota de Pedido - Silentuevento</title>
+    <style>
+        /* ESTILOS BASE (ESCRITORIO / GENERAL) */
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f4f9; 
+            padding: 0; 
+            margin: 0; 
+        }
+        .container {
+            max-width: 1000px; 
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 { 
+            text-align: center; 
+            color: #333; 
+            margin-top: 0;
+            margin-bottom: 5px; 
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #e30052; 
+            margin-bottom: 15px;
+        }
+        
+        /* ESTILOS DE ENCABEZADO SOCIAL */
+        .header-social {
+            background-color: #f0f0f0;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .header-social strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        .header-social .contact-info {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .header-social .social-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0 10px;
+        }
+        .header-social a {
+            color: #337ab7;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        
+        /* Estilos de la cabecera de información (Grid en escritorio) */
+        .header-info {
+            background-color: #fffacd;
+            padding: 15px; 
+            border: 1px dashed #daa520;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            display: grid; 
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 20px; 
+        }
+        .header-info .full-width { grid-column: 1 / -1; }
+        .header-info label { font-weight: bold; margin-bottom: 3px; display: block; font-size: 0.9em; }
+        .header-info input, .header-info select, .header-info textarea { 
+            width: 100%; 
+            padding: 8px; 
+            box-sizing: border-box; 
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        /* Estilo para la aclaración */
+        .aclaracion {
+            grid-column: 1 / -1; /* Ocupa ambas columnas en escritorio */
+            font-size: 0.9em;
+            color: #d63384; /* Color para destacar la nota */
+            font-weight: bold;
+            text-align: center;
+            margin-top: -10px; /* Acercar al campo anterior */
+            margin-bottom: 5px;
+        }
+
+        /* Contenedores de ACUERDOS Y CONDICIONES */
+        .acuerdos-condiciones {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        /* ESTILO INICIAL: Ocultar Acuerdos y Botón de Envío */
+        #acuerdos-y-envio {
+            display: none; 
+        }
+        .acuerdos-condiciones h2 {
+            font-size: 1.2em;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .acuerdos-condiciones p {
+            margin: 8px 0;
+        }
+        .acuerdos-condiciones strong {
+            color: #e30052;
+        }
+        /* CLASE PROMO: Color verde para destacar promociones */
+        .acuerdos-condiciones .promo {
+            color: #25D366;
+            font-weight: bold;
+        }
+        /* CLASE ROJO ALERTA: Para el texto del revendedor */
+        .rojo-alerta {
+            color: #dc3545; /* Rojo de alerta */
+            font-weight: bold;
+        }
+
+
+        /* Contenedores de enlaces de fotos */
+        .link-container {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #d4f1f4; 
+            border-radius: 4px;
+            text-align: center;
+        }
+        .link-container a {
+            color: #007bff;
+            font-weight: bold;
+            text-decoration: none;
+            display: block;
+        }
+        /* Ocultos por defecto, controlados por JS */
+        #fotos-camperas-link-container, 
+        #mas-camperas-link-container, 
+        #titere-link-container,
+        #adicional-jardin-link-container, 
+        #secundaria-link-container { display: none; } 
+
+        /* Estilos de la tabla (Verde Pastel y Scroll) */
+        .table-wrapper {
+            overflow-x: auto; 
+            width: 100%; 
+            margin-bottom: 20px;
+            background-color: #e0ffe0; /* VERDE PASTEL */
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        
+        /* ESTILO PARA LA INDICACIÓN DE DESLIZAMIENTO A LA DERECHA */
+        .swipe-hint {
+            display: none; /* Oculto por defecto en escritorio */
+            text-align: right; 
+            color: #e30052;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            padding-right: 5px;
+        }
+
+
+        .tabla-pedidos {
+            min-width: 700px; 
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .tabla-pedidos th, .tabla-pedidos td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+            background-color: #e0ffe0; /* VERDE PASTEL */
+        }
+        .tabla-pedidos th {
+            background-color: #aed6f1; 
+            color: #333;
+            font-size: 12px;
+            padding: 7px 5px;
+            white-space: nowrap; 
+        }
+        /* Estilo específico para el campo de precio unitario */
+        .tabla-pedidos .precio-unitario {
+             font-weight: bold;
+             text-align: right;
+             color: #007bff;
+             background-color: #f0f8ff;
+             min-width: 80px;
+        }
+        .tabla-pedidos input, .tabla-pedidos select {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            padding: 3px;
+            text-align: center;
+            background-color: white; 
+        }
+        
+        /* Ocultar columna de Títere por defecto */
+        .columna-titere {
+            display: none;
+        }
+        
+        /* AJUSTE DE ANCHOS DE COLUMNA (Final - Aplicando 35/15/15) */
+        /* Suma total: 5% + 35% + 10% + 15% + 15% + 10% + 10% = 100% */
+        .tabla-pedidos th:nth-child(1), .tabla-pedidos td:nth-child(1) { width: 5%; } /* # */
+        .tabla-pedidos th:nth-child(2), .tabla-pedidos td:nth-child(2) { width: 35%; text-align: left; } /* Nombre/Apodo */
+        .tabla-pedidos th:nth-child(3), .tabla-pedidos td:nth-child(3) { width: 10%; } /* Talle */
+        .tabla-pedidos th:nth-child(4), .tabla-pedidos td:nth-child(4) { width: 15%; } /* P. UNIT. $ */
+        .tabla-pedidos th:nth-child(5), .tabla-pedidos td:nth-child(5) { width: 15%; } /* Seña $ */
+        .tabla-pedidos th:nth-child(6), .tabla-pedidos td:nth-child(6) { width: 10%; } /* Títere (oculto si no es jardín) */
+        .tabla-pedidos th:last-child, .tabla-pedidos td:last-child { width: 10%; } /* Acciones (Quitar) */
+        
+        /* Botones y Resumen... */
+        .add-row-btn, .whatsapp-btn {
+            padding: 12px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            font-size: 16px;
+            color: white;
+            border: none;
+        }
+        .add-row-btn { background-color: #337ab7; }
+        .whatsapp-btn { background-color: #25D366; margin-top: 30px; }
+        .remove-row-btn {
+            background-color: #e30052;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .summary { margin-top: 20px; text-align: right; }
+        .summary p { margin: 5px 0; font-size: 16px; }
+        .summary input { font-weight: bold; border: none; width: 100px; text-align: right; padding: 0; background: none; }
+        /* Estilo para la resta (Destacado) */
+        #restaAbonarInput {
+            color: #e30052; /* Destacar en color rojo/rosa */
+            font-size: 1.1em;
+            width: 120px !important;
+        }
+
+
+        /* MEDIA QUERIES PARA MÓVILES (Hacer visible el indicador de deslizamiento) */
+        @media (max-width: 600px) {
+            .container { padding: 10px; margin: 0; box-shadow: none; border-radius: 0; }
+            .header-info { grid-template-columns: 1fr; gap: 10px; padding: 10px; }
+            .header-info .full-width { grid-column: auto; } 
+            
+            .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .tabla-pedidos { width: max-content; min-width: 100%; display: table; }
+            .tabla-pedidos thead { display: table-header-group; }
+            .tabla-pedidos tbody, .tabla-pedidos tr { display: table-row-group; }
+            .tabla-pedidos tr { border: 1px solid #ccc; margin-bottom: 0; padding: 0; }
+            
+            .tabla-pedidos th, .tabla-pedidos td { 
+                display: table-cell; 
+                text-align: center; 
+                border: 1px solid #ccc; 
+                white-space: nowrap; 
+            }
+            
+            .tabla-pedidos td label { display: none; }
+            .tabla-pedidos input, .tabla-pedidos select { min-width: 70px; width: 100%; }
+
+            /* Muestra el indicador de deslizamiento a la derecha en móvil */
+            .swipe-hint {
+                display: block; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📝 NOTA DE PEDIDO</h1>
+    <div class="subtitle">COMPRA GRUPAL</div>
+    
+    <div class="header-social">
+        <strong>SILENTUEVENTO</strong> 
+        <span class="contact-info">WHATSAPP 2235854534</span>
+        <div class="social-links">
+            <a href="https://www.instagram.com/silentuevento/" target="_blank">Instagram</a>
+            <a href="https://web.facebook.com/silentueventoproductospersonalizados" target="_blank">Facebook</a>
+            <a href="https://www.tiktok.com/@silentuevento" target="_blank">TikTok</a> 
+        </div>
+    </div>
+
+    <form id="camperasForm">
+        <div class="header-info">
+            
+            <div class="input-group">
+                <label for="fecha">FECHA DE PEDIDO:</label>
+                <input type="date" id="fecha" name="fecha">
+            </div>
+
+            <div class="input-group">
+                <label for="pedido">Nº DE PEDIDO:</label>
+                <input type="text" id="pedido" name="pedido" placeholder="COMPLETA EL VENDEDOR">
+            </div>
+
+            <div class="input-group">
+                <label for="nivel">NIVEL EDUCATIVO:</label>
+                <select id="nivel" name="nivel" onchange="manejarNivel()" required>
+                    <option value="">-- Seleccionar Nivel --</option>
+                    <option value="JARDIN">JARDÍN</option>
+                    <option value="PRIMARIA">PRIMARIA</option>
+                    <option value="SECUNDARIA">SECUNDARIA</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="articulo">TIPO DE ARTÍCULO:</label>
+                <select id="articulo" name="articulo" onchange="manejarNivel()" required>
+                     <option value="">-- Seleccionar Artículo --</option>
+                </select>
+            </div>
+
+            <div class="aclaracion full-width">
+                *ACLARACIÓN: Se envía una planilla por cada prenda de vestir.
+            </div>
+            <div class="input-group">
+                <label for="escuela">NOMBRE DE LA ESCUELA / JARDÍN:</label>
+                <input type="text" id="escuela" name="escuela" placeholder="Ej: E.P. N° 45 'Granaderos de San Martín'" required>
+            </div>
+
+            <div class="input-group">
+                <label for="contacto">FAMILIA/S DE CONTACTO:</label>
+                <input type="text" id="contacto" name="contacto" placeholder="Nombre/s de la/s familia/s (Ej: MICA RUIZ)">
+            </div>
+            
+            <div class="input-group">
+                <label for="celular">Nº DE CEL.:</label>
+                <input type="tel" id="celular" name="celular" placeholder="" required>
+            </div>
+        </div>
+        
+        
+        <div id="fotos-camperas-link-container" class="link-container">
+            <a href="https://photos.app.goo.gl/z1z8MB79pcFL6tVi8" target="_blank">HAGA CLIC PARA VER FOTOS DE CAMPERAS</a>
+        </div>
+
+        <div id="mas-camperas-link-container" class="link-container">
+            <a href="https://photos.app.goo.gl/ffQAeMV866Lxhaur6" target="_blank">HAGA CLIC PARA VER FOTOS DE MAS CAMPERAS</a>
+        </div>
+        
+        <div id="adicional-jardin-link-container" class="link-container">
+            <a href="https://photos.app.goo.gl/YjhE4y34Dc2e1SXx6" target="_blank">HAGA CLIC AQUÍ PARA VER FOTOS (JARDÍN)</a>
+        </div>
+        
+        <div id="titere-link-container" class="link-container">
+            <a href="https://photos.app.goo.gl/EiRpyL8o5ZFJaQeN7" target="_blank">HAGA CLIC PARA ELEGIR Nº DE TITERE DE REGALO</a>
+        </div>
+
+        <div id="secundaria-link-container" class="link-container">
+            <a href="https://photos.app.goo.gl/YjhE4y34Dc2e1SXx6" target="_blank">HAGA CLIC PARA VER FOTOS DE CAMPERAS SECUNDARIA</a>
+        </div>
+
+
+        <h2>Detalles del Artículo</h2>
+        <p id="detalle-articulo" style="font-size: 12px; margin-bottom: 10px; color: #e30052; font-weight: bold;">
+            Seleccione el nivel educativo y el tipo de artículo.
+        </p>
+        
+        <p class="swipe-hint">
+            DESLIZA PARA VER PRECIOS Y TALLES &#x21D2;
+        </p>
+        <div class="table-wrapper">
+            <table class="tabla-pedidos">
+                <thead>
+                    <tr>
+                        <th data-col="index">#</th>
+                        <th data-col="nombre-apodo">NOMBRE O APODO</th>
+                        <th data-col="talle">TALLE</th>
+                        <th data-col="precio">P. UNIT. $</th> 
+                        <th data-col="sena">SEÑA $</th>
+                        <th data-col="titere" class="columna-titere">Nº TÍTERE (1-40)</th>
+                        <th data-col="acciones">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody id="pedido-body">
+                    </tbody>
+            </table>
+        </div>
+        
+        <button type="button" class="add-row-btn" onclick="agregarFilaCampera()">+ AGREGAR ARTÍCULO AL PEDIDO</button>
+
+        <div class="summary">
+            <p>TOTAL DEL PEDIDO: $<input type="number" id="totalPedido" name="totalPedido" value="0.00" readonly></p>
+            <p>TOTAL SEÑA: $<input type="number" id="totalSena" name="totalSena" value="0.00" readonly></p>
+            <p>RESTA A ABONAR: $<input type="number" id="restaAbonar" name="restaAbonar" value="0.00" readonly style="color: #e30052; font-size: 1.1em; width: 120px !important;"></p>
+        </div>
+        
+        <div class="header-info full-width" style="margin-top: 20px; display: block;">
+            <label for="observaciones">OBSERVACIONES / DETALLE DISEÑO:</label>
+            <textarea id="observaciones" name="observaciones" rows="3" placeholder="Aclarar aquí cualquier detalle sobre el diseño, colores, o talles especiales."></textarea>
+        </div>
+        
+        <div id="acuerdos-y-envio">
+            <div class="acuerdos-condiciones">
+                <h2>Acuerdos y Condiciones para el Encargo</h2>
+                <p>Para poder encargarlas acordamos:</p>
+                <ol>
+                    <li>Diseño de la misma.</li>
+                    <li>Listado con los nombres de los egresados.</li>
+                    <li>Determinamos 2 días para que puedan pasar por el 🏚taller (lunes a viernes de 14 a 19 hs.) para probar talle y entrega de la seña (50%*) o los VISITAMOS EN LA 🏫ESCUELA EN HORARIO Y DIA QUE LOS DIRECTIVOS NOS PERMITAN.</li>
+                    <li>Con el listado confirmado (PDF con número de pedido, talles, entrega de señas y fecha de entrega) retiran por el taller o acordamos entrega grupal en el establecimiento.</li>
+                    <li>
+                        <span id="promocion-condicional">
+                            </span>
+                    </li>
+                    <li><span class="promo">PROMO HERMANOS👨‍👩‍👧‍👧 QUE EGRESAN EL MISMO AÑO: 20% DE DESCUENTO POR LA COMPRA DE AMBAS CAMPERAS REALIZADAS EN SILENTUEVENTO.</span></li>
+                    <li>
+                        <strong>IMPORTANTE!!!</strong>
+                        <br>👨‍🎓👩‍🎓Si algún egresado queda fuera del grupo y desea realizar la campera, buzo, remera, etc. tendrá que consultar disponibilidad y precio por unidad. Por eso, aconsejamos que informen a todos los compañeros y puedan así encargarla sin complicaciones.
+                    </li>
+                </ol>
+                <p><strong>Condiciones de Pago:</strong></p>
+                <ul>
+                    <li>👉Se CONGELA CON el 50% de seña y el resto se abona cuando efectuamos la entrega.</li>
+                    <li>TAMBIEN PUEDEN ABONAR CON TARJETA DE CREDITO.</li>
+                </ul>
+                <p>
+                    <strong>ATENCION!!!:</strong> 💯Somos fabricantes directos <span class="rojo-alerta">**NO TENEMOS REVENDEDORES!!!**</span> RECOMENDAMOS QUE EN EL CASO DE ORGANIZARSE POR COMPRA GRUPAL SEAN 2 O 3 FAMILIAS QUE SE ENCARGUEN DEL PEDIDO, PARA EVITAR INCONVENIENTES CON LOS PAGOS O CADA FAMILIA ABONA INDIVIDUALMENTE DENTRO DE LOS 7 DÍAS DE ACORDAR LA COMPRA.
+                </p>
+                <p style="text-align: right; margin-top: 20px;">
+                    **Muchas Gracias!**<br>
+                    **SILENTUEVENTO**
+                </p>
+            </div>
+            <button type="button" class="whatsapp-btn" onclick="generarMensajeWhatsApp()">Enviar Pedido por WhatsApp</button>
+        </div>
+        </form>
+</div>
+
+<script>
+    let filaCounter = 0;
+    
+    // URLs de imágenes
+    const URL_TITERE_IMAGENES = 'https://photos.app.goo.gl/EiRpyL8o5ZFJaQeN7'; 
+    const URL_FOTOS_CAMPERAS = 'https://photos.app.goo.gl/z1z8MB79pcFL6tVi8';
+    const URL_FOTOS_MAS_CAMPERAS = 'https://photos.app.goo.gl/ffQAeMV866Lxhaur6'; 
+    const URL_FOTOS_ADICIONAL_JARDIN = 'https://photos.app.goo.gl/YjhE4y34Dc2e1SXx6'; 
+    const URL_FOTOS_SECUNDARIA = 'https://photos.app.goo.gl/YjhE4y34Dc2e1SXx6'; 
+    const URL_TIKTOK = 'https://www.tiktok.com/@silentuevento';
+    
+    // Talles filtrados por nivel
+    const TALLES_POR_NIVEL = {
+        JARDIN: ["6", "8", "10", "12", "14", "16"],
+        PRIMARIA: ["8", "10", "12", "14", "16", "S", "M", "L"],
+        SECUNDARIA: ["S", "M", "L", "XL", "XXL"]
+    };
+    
+    // Lista completa de artículos con su etiqueta para el select
+    const ARTICULOS_DISPONIBLES = [
+        "CAMPERA DEPORTIVO FRIZADO",
+        "BUZO FRISA DE ALGODÓN",
+        "REMERA EN TELA YERSEY SET",
+        "REMERA EN TELA DE ALGODÓN",
+        "REMERA EN TELA DRYFIT",
+        "CHOMBA EN TELA PIQUE SUBLIMABLE",
+        "REMERA EN TELA PIQUÉ SUBLIMABLE"
+    ];
+
+
+    // Constantes de descripción base
+    const DESCRIPCION_BASE = (articulo) => `${articulo.toUpperCase()} EN TELA... (DETALLE GENÉRICO)`;
+    const DESCRIPCION_ESPECIFICA = {
+        'CAMPERA DEPORTIVO FRIZADO': "CAMPERA EN TELA DEPORTIVO FRIZADO CON CIERRE IKK, CAPUCHA FORRADA.",
+        'BUZO FRISA DE ALGODÓN': "BUZO EN TELA FRISA DE ALGODÓN.",
+        'REMERA EN TELA YERSEY SET': "REMERA EN TELA YERSEY SET.",
+        'REMERA EN TELA DE ALGODÓN': "REMERA EN TELA DE ALGODÓN.",
+        'REMERA EN TELA DRYFIT': "REMERA EN TELA DRYFIT.", 
+        'CHOMBA EN TELA PIQUE SUBLIMABLE': "CHOMBA EN TELA PIQUE SUBLIMABLE.",
+        'REMERA EN TELA PIQUÉ SUBLIMABLE': "REMERA EN TELA PIQUÉ SUBLIMABLE."
+    };
+    
+    // Constantes de REGALO para JARDÍN (separadas)
+    const REGALO_SOLO_TITERE = "+ TÍTERE DE REGALO.";
+    const REGALO_CAMPERA_COMPLETO = "+ TÍTERE DE REGALO + BANDERA DE 60 CM. X 90 CM. + BOLSO DE REGALO PARA LA SEÑO.";
+    
+    // NUEVAS CONSTANTES PARA EL PUNTO 5 DE ACUERDOS (Actualizadas con spans promo)
+    const PROMO_JARDIN = 'Si la cantidad supera las 👕👕👕👕15 UNIDADES en CAMPERA <span class="promo">REGALAMOS UNA BANDERA DE 60 X 90 CM. Y UN BOLSO PARA REGALAR A LA SEÑO.</span>';
+    
+    // *** TEXTO ACTUALIZADO PARA PRIMARIA Y SECUNDARIA (con tags promo) ***
+    const PROMO_PRIMARIA_SECUNDARIA = 'Si la cantidad supera las 👕👕👕👕20 UNIDADES en CAMPERA O BUZO, incluimos una <span class="promo">CAMPERA (LIBERADA)</span> para REGALAR al compañero, que por alguna razón no pueda abonarla, UNA VEZ QUE RETIRARON Y ABONARON EL PEDIDO POR COMPLETO. <span class="promo">O PUEDEN OPTAR POR UNA</span> <span class="promo">🏳BANDERA de 2 x 1,50 mts.</span><br><small>(SOLO APLICA PROMO CAMPERA O BANDERA PARA PRIMARIA/SECUNDARIA)</small>';
+
+
+    // OBJETO DE PRECIOS
+    const PRECIOS_BASE = {
+        'CAMPERA DEPORTIVO FRIZADO': {
+            'JARDIN': 36000,
+            'PRIMARIA': 45000,
+            'SECUNDARIA': 45000 
+        },
+        'BUZO FRISA DE ALGODÓN': {
+            'JARDIN': 0, // No aplica
+            'PRIMARIA': 0,
+            'SECUNDARIA': 48000
+        },
+        'REMERA EN TELA YERSEY SET': {
+            'JARDIN': 10000,
+            'PRIMARIA': 15000,
+            'SECUNDARIA': 18000
+        },
+        'REMERA EN TELA DRYFIT': {
+            'JARDIN': 10000,
+            'PRIMARIA': 15000,
+            'SECUNDARIA': 18000
+        },
+        'REMERA EN TELA DE ALGODÓN': { 
+            'JARDIN': 13000,
+            'PRIMARIA': 18000,
+            'SECUNDARIA': 21000
+        },
+        'CHOMBA EN TELA PIQUE SUBLIMABLE': {
+            'JARDIN': 13000,
+            'PRIMARIA': 18000,
+            'SECUNDARIA': 21000
+        },
+        'REMERA EN TELA PIQUÉ SUBLIMABLE': {
+            'JARDIN': 13000,
+            'PRIMARIA': 18000,
+            'SECUNDARIA': 21000
+        }
+    };
+
+
+    /**
+     * Obtiene el precio unitario del artículo seleccionado.
+     */
+    function obtenerPrecioUnitario(articulo, nivel) {
+        return PRECIOS_BASE[articulo] ? (PRECIOS_BASE[articulo][nivel] || 0) : 0;
+    }
+    
+    /**
+     * Da formato al número como moneda.
+     */
+    function formatearPrecio(numero) {
+        // Usamos toFixed(2) para asegurar dos decimales para cálculos financieros, 
+        // y luego reemplazamos la coma por punto como separador de miles.
+        // NOTA: Para moneda argentina (ARS), el separador de miles es el punto y el decimal es la coma. 
+        // Pero aquí se pide que se muestre con el punto, lo mantendremos como separador de miles para la salida en el input.
+        return parseFloat(numero).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    
+    /**
+     * Filtra la lista de artículos según el nivel seleccionado.
+     * @returns {string} El HTML con las opciones del select.
+     */
+    function obtenerArticulosPorNivel() {
+        const nivel = document.getElementById('nivel').value;
+        let opciones = ['<option value="">-- Seleccionar Artículo --</option>'];
+
+        ARTICULOS_DISPONIBLES.forEach(articulo => {
+            // Regla de filtrado: Omitir BUZO FRISA DE ALGODÓN si el nivel es JARDIN
+            if (nivel === 'JARDIN' && articulo === 'BUZO FRISA DE ALGODÓN') {
+                return; 
+            }
+            opciones.push(`<option value="${articulo}">${articulo}</option>`);
+        });
+
+        return opciones.join('');
+    }
+
+    /**
+     * Genera las opciones de talle (select) basándose en el nivel educativo.
+     */
+    function obtenerTallesPorNivel() {
+        const nivel = document.getElementById('nivel').value;
+        let tallesArray = TALLES_POR_NIVEL[nivel] || [];
+        
+        if (tallesArray.length > 0 && !tallesArray.includes("OTRO")) {
+            tallesArray.push("OTRO");
+        }
+
+        let options = tallesArray.map(t => `<option value="${t}">${t}</option>`).join('');
+        return `<option value="">-- Talle --</option>${options}`;
+    }
+
+    /**
+     * Muestra/Oculta columnas, enlaces y actualiza el precio base visible.
+     */
+    function manejarNivel() {
+        const nivel = document.getElementById('nivel').value;
+        const articuloSelect = document.getElementById('articulo');
+        const acuerdosEnvioDiv = document.getElementById('acuerdos-y-envio');
+        
+        const esJardin = nivel === 'JARDIN';
+        const esPrimaria = nivel === 'PRIMARIA'; 
+        const esSecundaria = nivel === 'SECUNDARIA';
+        
+        const detalleElemento = document.getElementById('detalle-articulo');
+
+        // 0. **Control de visibilidad del contenedor de acuerdos**
+        if (nivel) {
+            acuerdosEnvioDiv.style.display = 'block';
+        } else {
+            acuerdosEnvioDiv.style.display = 'none';
+        }
+        
+        // 1. **Actualizar Opciones de Artículo**
+        const currentArticulo = articuloSelect.value;
+        articuloSelect.innerHTML = obtenerArticulosPorNivel();
+        
+        // Reintentar seleccionar el artículo anterior si sigue siendo válido
+        if (currentArticulo && articuloSelect.querySelector(`option[value="${currentArticulo}"]`)) {
+            articuloSelect.value = currentArticulo;
+        } else {
+             articuloSelect.value = '';
+        }
+        
+        const nuevoArticulo = articuloSelect.value; 
+
+        // 2. Visibilidad de los enlaces
+        const titereLinkContainer = document.getElementById('titere-link-container');
+        const fotosCamperasLinkContainer = document.getElementById('fotos-camperas-link-container');
+        const masCamperasLinkContainer = document.getElementById('mas-camperas-link-container');
+        const adicionalJardinLinkContainer = document.getElementById('adicional-jardin-link-container');
+        const secundariaLinkContainer = document.getElementById('secundaria-link-container');
+        
+        titereLinkContainer.style.display = esJardin ? 'block' : 'none';
+        adicionalJardinLinkContainer.style.display = esJardin ? 'block' : 'none'; 
+        fotosCamperasLinkContainer.style.display = esPrimaria ? 'block' : 'none';
+        masCamperasLinkContainer.style.display = esPrimaria ? 'block' : 'none';
+        secundariaLinkContainer.style.display = esSecundaria ? 'block' : 'none';
+        
+        // 3. Visibilidad de la columna Títere
+        const titereHeaders = document.querySelectorAll('.tabla-pedidos th[data-col="titere"]');
+        titereHeaders.forEach(el => {
+            el.style.display = esJardin ? 'table-cell' : 'none';
+            el.classList.toggle('columna-titere', !esJardin);
+        });
+        
+        // 4. Actualizar la descripción del artículo y añadir el precio si existe
+        // Usamos el valor actual del select después de la posible modificación
+        let descripcionBase = DESCRIPCION_ESPECIFICA[nuevoArticulo] || DESCRIPCION_BASE(nuevoArticulo);
+        let precioBase = obtenerPrecioUnitario(nuevoArticulo, nivel);
+        
+        // El precio ahora se mostrará con dos decimales para ser más claro
+        let precioTexto = precioBase > 0 ? `Precio Base: *$${formatearPrecio(precioBase)}*` : 'Seleccione Nivel y Artículo para ver el precio.';
+
+
+        if (esJardin && nuevoArticulo) {
+            // Lógica de regalo CONDICIONAL para JARDÍN
+            const regalos = (nuevoArticulo === 'CAMPERA DEPORTIVO FRIZADO') 
+                           ? REGALO_CAMPERA_COMPLETO 
+                           : REGALO_SOLO_TITERE;
+            
+            detalleElemento.innerHTML = `${descripcionBase} ${regalos}. ${precioTexto}`;
+            
+        } else if (nivel && nuevoArticulo) {
+            detalleElemento.innerHTML = `${descripcionBase}. ${precioTexto}`;
+        } else {
+             detalleElemento.innerHTML = 'Seleccione el nivel educativo y el tipo de artículo.';
+        }
+        
+        // 5. **Actualizar el punto 5 de Acuerdos (Promoción Condicional)**
+        const promoCondicionalElement = document.getElementById('promocion-condicional');
+        if (promoCondicionalElement) {
+             promoCondicionalElement.innerHTML = esJardin ? PROMO_JARDIN : PROMO_PRIMARIA_SECUNDARIA;
+        }
+
+        // 6. Actualizar las opciones de talles y precios en las filas existentes
+        const rows = document.querySelectorAll('#pedido-body tr');
+        const talleOptions = obtenerTallesPorNivel();
+        
+        rows.forEach(row => {
+            const rowId = row.getAttribute('data-id');
+            const selectTalle = document.getElementById(`talle_${rowId}`);
+            const inputTitere = document.getElementById(`titere_${rowId}`);
+            const cellTitere = inputTitere ? inputTitere.closest('td') : null;
+            const precioCell = row.querySelector('.precio-unitario-cell');
+
+            // Actualizar opciones de talle
+            const currentValueTalle = selectTalle.value;
+            selectTalle.innerHTML = talleOptions;
+            if (currentValueTalle && selectTalle.querySelector(`option[value="${currentValueTalle}"]`)) {
+                 selectTalle.value = currentValueTalle;
+            } else {
+                 selectTalle.value = '';
+            }
+            
+            // Actualizar precio unitario visible en la fila
+            if (precioCell) {
+                 precioCell.textContent = `$${formatearPrecio(precioBase)}`;
+                 precioCell.setAttribute('data-price', precioBase);
+            }
+            
+            // Actualizar visibilidad y requerimiento de Títere
+            if (cellTitere) {
+                cellTitere.style.display = esJardin ? 'table-cell' : 'none';
+                inputTitere.required = esJardin;
+                if (!esJardin) inputTitere.value = ''; 
+            }
+        });
+        
+        // 7. **Actualizar el resumen (cálculos)**
+        calcularResumenPedido();
+
+        // Si no hay filas y el nivel y artículo están seleccionados, añade la primera fila.
+        if (nivel && nuevoArticulo && rows.length === 0) {
+            agregarFilaCampera();
+        }
+    }
+
+    /**
+     * Agrega una nueva fila a la tabla.
+     */
+    function agregarFilaCampera() {
+        const nivelSeleccionado = document.getElementById('nivel').value;
+        const articuloSeleccionado = document.getElementById('articulo').value; 
+        
+        if (!nivelSeleccionado || !articuloSeleccionado) {
+             alert('Por favor, selecciona el Nivel Educativo y el Tipo de Artículo.');
+             return;
+        }
+        
+        // Validación específica para Buzo en Jardín (Redundante, pero seguro)
+        if (nivelSeleccionado === 'JARDIN' && articuloSeleccionado === 'BUZO FRISA DE ALGODÓN') {
+             alert('El Buzo Frisa de Algodón no está disponible para el nivel Jardín. Por favor, selecciona otro artículo.');
+             return;
+        }
+
+        filaCounter++;
+        const newId = filaCounter;
+        const tbody = document.getElementById('pedido-body');
+        const talleOptions = obtenerTallesPorNivel();
+        const esJardin = nivelSeleccionado === 'JARDIN';
+        const titereStyle = esJardin ? 'table-cell' : 'none';
+
+        const precioBase = obtenerPrecioUnitario(articuloSeleccionado, nivelSeleccionado);
+        // Usamos formatearPrecio para mostrar el precio correctamente en la celda.
+        const precioFormateado = formatearPrecio(precioBase);
+
+
+        const newRow = document.createElement('tr');
+        newRow.setAttribute('data-id', newId);
+        newRow.innerHTML = `
+            <td data-label="#">${newId}</td>
+            <td data-label="Nombre o Apodo"><label style="display:none;">Nombre o Apodo:</label><input type="text" id="nombreApodo_${newId}" name="nombreApodo_${newId}" placeholder="Ej: JOAQUI" required></td>
+            <td data-label="Talle"><label style="display:none;">Talle:</label>
+                <select id="talle_${newId}" name="talle_${newId}" class="talle-select" required>
+                    ${talleOptions}
+                </select>
+            </td>
+            <td data-label="P. Unit. $" class="precio-unitario-cell precio-unitario" data-price="${precioBase}">
+                $${precioFormateado}
+            </td>
+            <td data-label="Seña $"><label style="display:none;">Seña $:</label><input type="number" id="sena_${newId}" name="sena_${newId}" placeholder="0.00" step="0.01" min="0" oninput="calcularResumenPedido()"></td>
+            <td data-label="Nº Títere" data-col="titere" style="display: ${titereStyle};">
+                <label style="display:none;">Nº Títere (1-40):</label>
+                <input type="number" id="titere_${newId}" name="titere_${newId}" placeholder="Nº 1-40" min="1" max="40" ${esJardin ? 'required' : ''}>
+            </td>
+            <td data-label="Acciones"><button type="button" class="remove-row-btn" onclick="eliminarFila(this)">X Quitar</button></td>
+        `;
+        tbody.appendChild(newRow);
+        
+        document.getElementById(`nombreApodo_${newId}`).focus();
+        calcularResumenPedido();
+    }
+
+    /**
+     * Elimina una fila y recalcula el resumen.
+     */
+    function eliminarFila(button) {
+        const row = button.closest('tr');
+        row.remove();
+        reestructurarTabla();
+        calcularResumenPedido();
+    }
+    
+    /**
+     * Reestructura los números de fila.
+     */
+    function reestructurarTabla() {
+        const rows = document.querySelectorAll('#pedido-body tr');
+        rows.forEach((row, index) => {
+            row.querySelector('td:first-child').textContent = index + 1;
+        });
+        filaCounter = rows.length;
+    }
+
+    /**
+     * Calcula y actualiza el total del pedido, la seña y la resta a pagar.
+     */
+    function calcularResumenPedido() {
+        const rows = document.querySelectorAll('#pedido-body tr');
+        const numArticulos = rows.length;
+        
+        let precioUnitario = 0;
+        // Obtener el precio unitario del primer artículo, o 0 si no hay
+        if (numArticulos > 0) {
+            const precioCell = rows[0].querySelector('.precio-unitario-cell');
+            if (precioCell) {
+                // Usamos parseFloat directamente del atributo data-price para la precisión del cálculo.
+                precioUnitario = parseFloat(precioCell.getAttribute('data-price')) || 0;
+            }
+        }
+        
+        let totalSena = 0;
+        const senaInputs = document.querySelectorAll('[id^="sena_"]');
+        senaInputs.forEach(input => {
+            const value = parseFloat(input.value) || 0;
+            totalSena += value;
+        });
+        
+        const totalPedido = precioUnitario * numArticulos;
+        const restaAbonar = totalPedido - totalSena;
+        
+        // Asignar los valores a los inputs del resumen (toFixed(2) para los decimales)
+        document.getElementById('totalPedido').value = parseFloat(totalPedido).toFixed(2);
+        document.getElementById('totalSena').value = parseFloat(totalSena).toFixed(2);
+        document.getElementById('restaAbonar').value = parseFloat(restaAbonar).toFixed(2);
+    }
+    
+    function obtenerDatosCamperas() {
+        const datos = [];
+        const rows = document.querySelectorAll('#pedido-body tr');
+        const esJardin = document.getElementById('nivel').value === 'JARDIN';
+        
+        // Obtener el precio unitario base del encabezado del resumen (usando la función obtenerPrecioUnitario)
+        const nivel = document.getElementById('nivel').value;
+        const articulo = document.getElementById('articulo').value;
+        const precioUnitario = obtenerPrecioUnitario(articulo, nivel);
+        
+        rows.forEach(row => {
+            const id = row.getAttribute('data-id');
+            const titereInput = document.getElementById(`titere_${id}`);
+            
+            const data = {
+                nombreApodo: document.getElementById(`nombreApodo_${id}`)?.value.trim() || 'N/A',
+                talle: document.getElementById(`talle_${id}`)?.value || 'N/A',
+                precioUnitario: precioUnitario, 
+                sena: document.getElementById(`sena_${id}`)?.value || '0',
+                titere: esJardin ? (titereInput?.value || 'N/A') : '' 
+            };
+            datos.push(data);
+        });
+        return datos;
+    }
+
+    /**
+     * Genera el mensaje para enviar por WhatsApp.
+     */
+    function generarMensajeWhatsApp() {
+        const nivel = document.getElementById('nivel').value;
+        const articulo = document.getElementById('articulo').value; 
+        const nombreInstitucion = document.getElementById('escuela').value.trim();
+        const contacto = document.getElementById('contacto').value.trim();
+        const celular = document.getElementById('celular').value.trim();
+        const fecha = document.getElementById('fecha').value;
+        const pedido = document.getElementById('pedido').value.trim();
+        const observaciones = document.getElementById('observaciones').value.trim();
+        
+        // Obtener los valores calculados directamente de los inputs
+        const totalPedido = document.getElementById('totalPedido').value;
+        const totalSena = document.getElementById('totalSena').value;
+        const restaAbonar = document.getElementById('restaAbonar').value;
+        
+        const camperas = obtenerDatosCamperas();
+        
+        const esJardin = nivel === 'JARDIN';
+        
+        // Validación de campos obligatorios
+        if (!nivel || !articulo || !nombreInstitucion || !contacto || !celular || camperas.length === 0 || !camperas.every(c => c.nombreApodo && c.talle)) {
+            alert('Por favor, selecciona el Nivel Educativo y el Tipo de Artículo y completa todos los campos obligatorios de la Cabecera y los artículos.');
+            return;
+        }
+
+        // Obtener la descripción del artículo y precio para el mensaje
+        let detalleArticuloMensaje = DESCRIPCION_ESPECIFICA[articulo] || DESCRIPCION_BASE(articulo);
+        let precioUnitarioBase = obtenerPrecioUnitario(articulo, nivel);
+        
+        if (esJardin) {
+            const regalos = (articulo === 'CAMPERA DEPORTIVO FRIZADO') 
+                           ? REGALO_CAMPERA_COMPLETO 
+                           : REGALO_SOLO_TITERE;
+            detalleArticuloMensaje += ` ${regalos}`;
+        }
+
+
+        let mensaje = `*📝 NOTA DE PEDIDO - COMPRA GRUPAL - SILENTUEVENTO*\n\n`;
+        mensaje += `*--- DATOS DEL PEDIDO ---*\n`;
+        mensaje += `Fecha Pedido: ${fecha || 'N/A'}\n`;
+        mensaje += `Nº de Pedido (Vendedor): ${pedido || 'PENDIENTE'}\n`;
+        mensaje += `Nivel Educativo: ${nivel}\n`;
+        mensaje += `Tipo de Artículo: ${articulo}\n`;
+        mensaje += `Nombre Institución: ${nombreInstitucion}\n`; 
+        mensaje += `Familia/s de Contacto: ${contacto}\n`;
+        mensaje += `Celular: ${celular}\n\n`;
+        
+        mensaje += `*--- DESCRIPCIÓN DEL ARTÍCULO ---*\n`;
+        mensaje += `${detalleArticuloMensaje}\n`;
+        mensaje += `*PRECIO UNITARIO: $${formatearPrecio(precioUnitarioBase)}*\n\n`; 
+        
+        mensaje += `*--- DETALLE DE ARTÍCULOS (${camperas.length}) ---*\n`;
+        
+        camperas.forEach((c, index) => {
+            mensaje += `\nArtículo #${index + 1}\n`;
+            mensaje += `Nombre/Apodo: ${c.nombreApodo}\n`;
+            mensaje += `Talle: ${c.talle}\n`;
+            mensaje += `Precio Base Unitario: $${formatearPrecio(precioUnitarioBase)}\n`; 
+            mensaje += `Seña: $${formatearPrecio(c.sena)}\n`; 
+            
+            if (esJardin) {
+                mensaje += `Nº Títere Elegido: ${c.titere}\n`;
+            }
+        });
+        
+        // Agregar los enlaces de fotos al mensaje de WhatsApp
+        const enlaces = document.querySelectorAll('.link-container a');
+        enlaces.forEach(a => {
+            if(a.closest('#fotos-camperas-link-container') && nivel === 'PRIMARIA') {
+                mensaje += `\n*ENLACE FOTOS PRIMARIA 1*: ${a.href}`;
+            } else if (a.closest('#mas-camperas-link-container') && nivel === 'PRIMARIA') {
+                mensaje += `\n*ENLACE FOTOS PRIMARIA 2*: ${a.href}`;
+            } else if (a.closest('#adicional-jardin-link-container') && nivel === 'JARDIN') {
+                mensaje += `\n*ENLACE FOTOS JARDÍN*: ${a.href}`;
+            } else if (a.closest('#titere-link-container') && nivel === 'JARDIN') {
+                mensaje += `\n*ENLACE TÍTERES*: ${a.href}`;
+            } else if (a.closest('#secundaria-link-container') && nivel === 'SECUNDARIA') {
+                mensaje += `\n*ENLACE FOTOS SECUNDARIA*: ${a.href}`;
+            }
+        });
+        
+        mensaje += `\n\n*--- REDES SOCIALES ---*\n`;
+        mensaje += `TikTok: ${URL_TIKTOK}\n\n`; 
+        
+        // --- INCLUIR LA PROMOCIÓN ESPECÍFICA EN EL MENSAJE DE WHATSAPP ---
+        let acuerdoPunto5Mensaje;
+        if (nivel === 'JARDIN') {
+             acuerdoPunto5Mensaje = '5- PROMO JARDÍN: Si la cantidad supera las 👕👕👕👕15 UNIDADES en CAMPERA *REGALAMOS UNA BANDERA DE 60 X 90 CM. Y UN BOLSO PARA REGALAR A LA SEÑO.*';
+        } else {
+             acuerdoPunto5Mensaje = `5- Si la cantidad supera las 👕👕👕👕20 UNIDADES en CAMPERA O BUZO, incluimos una *CAMPERA (LIBERADA)* para REGALAR al compañero, que por alguna razón no pueda abonarla, UNA VEZ QUE RETIRARON Y ABONARON EL PEDIDO POR COMPLETO. *O PUEDEN OPTAR POR UNA* *🏳BANDERA de 2 x 1,50 mts.* (SOLO APLICA PROMO CAMPERA O BANDERA PARA PRIMARIA/SECUNDARIA)`;
+        }
+        
+        // Incluimos los acuerdos en el mensaje de WhatsApp para que queden registrados.
+        const acuerdosTexto = `
+*--- ACUERDOS Y CONDICIONES ---*
+1- Diseño de la misma.
+2- Listado con los nombres de los egresados.
+3- Determinamos 2 días para pasar por el taller (L-V 14 a 19 hs.) para talle y seña (50%*) O los VISITAMOS EN LA ESCUELA.
+4- Con listado confirmado (PDF con pedido, talles, señas y fecha) retiran por taller o acordamos entrega grupal.
+${acuerdoPunto5Mensaje}
+6- *PROMO HERMANOS*: 20% DE DESCUENTO en ambas camperas.
+7- IMPORTANTE: Si un egresado queda fuera, debe consultar disponibilidad y precio por unidad.
+*Condiciones de Pago:*
+- Se CONGELA CON el 50% de seña. El resto se abona al entregar.
+- También pueden ABONAR CON TARJETA DE CRÉDITO.
+- ATENCIÓN!!!: 💯Somos fabricantes directos **NO TENEMOS REVENDEDORES!!!** RECOMENDAMOS QUE EN EL CASO DE ORGANIZARSE POR COMPRA GRUPAL SEAN 2 O 3 FAMILIAS QUE SE ENCARGUEN DEL PEDIDO, PARA EVITAR INCONVENIENTES CON LOS PAGOS O CADA FAMILIA ABONA INDIVIDUALMENTE DENTRO DE LOS 7 DÍAS DE ACORDAR LA COMPRA.
+Muchas Gracias!
+SILENTUEVENTO
+`;
+        mensaje += acuerdosTexto;
+        
+        mensaje += `\n*--- RESUMEN FINANCIERO ---*\n`;
+        mensaje += `TOTAL PEDIDO: $${formatearPrecio(totalPedido)}\n`;
+        mensaje += `TOTAL SEÑA RECIBIDA: $${formatearPrecio(totalSena)}\n`;
+        mensaje += `RESTA A ABONAR: $${formatearPrecio(restaAbonar)}\n\n`;
+        
+        mensaje += `*--- OBSERVACIONES / DISEÑO ---*\n`;
+        mensaje += `${observaciones || 'No hay observaciones adicionales.'}\n\n`;
+        
+        mensaje += `¡Gracias por tu pedido! 😊`;
+
+
+        const mensajeCodificado = encodeURIComponent(mensaje);
+        const numeroWhatsApp = '5492235854534'; 
+        const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`;
+        
+        window.open(urlWhatsApp, '_blank');
+    }
+
+    // Inicialización
+    window.onload = () => {
+        // Asignar las URLs a los enlaces 
+        document.querySelector('#titere-link-container a').href = URL_TITERE_IMAGENES;
+        document.querySelector('#fotos-camperas-link-container a').href = URL_FOTOS_CAMPERAS;
+        document.querySelector('#mas-camperas-link-container a').href = URL_FOTOS_MAS_CAMPERAS;
+        document.querySelector('#adicional-jardin-link-container a').href = URL_FOTOS_ADICIONAL_JARDIN;
+        document.querySelector('#secundaria-link-container a').href = URL_FOTOS_SECUNDARIA; 
+        
+        // Inicia el manejo del nivel para cargar las opciones correctas y la promoción del punto 5
+        manejarNivel();
+    };
+</script>
+
+</body>
+</html>

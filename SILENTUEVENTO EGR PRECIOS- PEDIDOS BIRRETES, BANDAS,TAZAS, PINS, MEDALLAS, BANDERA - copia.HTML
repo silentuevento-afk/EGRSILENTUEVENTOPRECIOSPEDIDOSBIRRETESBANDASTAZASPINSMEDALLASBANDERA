@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilla de Pedidos Egresados - Multi-Artículo (Colores Rotativos v3)</title>
+    <style>
+        /* Estilos CSS: (Minimizado para mantener el foco en la función) */
+        
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 0; margin: 0; }
+        
+        /* Ajuste para pantallas grandes (manteniendo el ancho y centrado) */
+        .planilla-container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            background: #fff; 
+            border: 1px solid #ccc; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            padding: 20px; 
+            box-sizing: border-box; 
+        }
+        h1, h2 { text-align: center; color: #333; }
+        
+        /* CABECERA DE CONTACTO UNIFICADA (COLOR #e30052) */
+        .header-title-split {
+            background-color: #e30052; 
+            color: white;
+            padding: 5px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 1px; 
+        }
+        .header-title-split:first-of-type {
+            font-size: 1.3em;
+        }
+
+        /* NUEVO ESTILO PARA "COMPRA GRUPAL" */
+        .subtitle {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #e30052; 
+            margin-bottom: 5px; /* Pequeño margen para separarlo de la línea roja */
+        }
+        
+        /* CABECERA SOCIAL: VERDE CLARO MANZANA */
+        .header-social { 
+            background-color: #A8E4A0;
+            color: #333;
+            padding: 5px; 
+            margin-bottom: 10px; 
+            text-align: center; 
+            font-weight: bold; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+        }
+        .header-social a {
+            color: #333; 
+            font-weight: bold; 
+            text-decoration: none;
+            margin-top: 2px; 
+            word-break: break-all;
+        }
+
+
+        /* Cabecera Info */
+        .header-info { 
+            background-color: #ffe0c0; 
+            padding: 10px; 
+            border: 1px solid #ffcc80; 
+            margin-bottom: 20px; 
+        }
+        .header-info .row { display: flex; gap: 20px; margin-bottom: 5px; }
+        .header-info .input-group-half { flex: 1; display: flex; align-items: center; }
+        .header-info p { margin: 5px 0; display: flex; align-items: center; }
+        .header-info label { font-weight: bold; width: 150px; flex-shrink: 0; }
+        .header-info .input-group-half label { width: 80px; }
+        .header-info input { flex-grow: 1; padding: 5px; border: 1px solid #ccc; border-radius: 3px; }
+
+        /* DETALLE DE ARTÍCULO (Bloque Dinámico) */
+        .item-details { 
+            padding: 10px; 
+            border: 1px solid #e5d8a2; 
+            margin: 10px 0 5px 0; 
+        }
+
+        /* CLASES DE FONDOS ROTATIVOS (NUEVOS COLORES) */
+        .color-0 { background-color: #FFDDE1; } /* Rosa Suave */
+        .color-1 { background-color: #D4F1F4; } /* Azul Claro */
+        .color-2 { background-color: #D4EDDA; } /* Verde Menta */
+        .color-3 { background-color: #FFF5E1; } /* Melocotón Pálido */
+        .color-4 { background-color: #E6E6FA; } /* Lavanda Pálida */
+        
+        .item-details-container { /* Contenedor para múltiples artículos */
+             border: 2px dashed #e30052; 
+             padding: 10px; 
+             margin-bottom: 20px;
+        }
+        .item-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .item-details-header h3 {
+            margin: 0;
+            color: #e30052;
+            font-size: 1.2em;
+        }
+        .remove-button {
+            background: #e30052;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .add-article-button {
+            background-color: #337ab7;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 15px;
+        }
+        .articulo-detalle { border: 1px dashed #c0c0c0; padding: 10px; margin-top: 10px; }
+        .item-row { display: flex; gap: 20px; margin-bottom: 5px; align-items: center; flex-wrap: wrap; }
+        .item-row.top { display: flex; gap: 20px; margin-bottom: 10px; flex-wrap: wrap;}
+        .item-details-grid { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .input-group.detail, .input-group.half, .input-group.full { 
+            flex: 1 1 30%; 
+            min-width: 150px; 
+            display: flex; 
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+        .input-group.full { flex: 1 1 100%; min-width: 100%; }
+        .input-group.half { flex-basis: 33.33%; min-width: 100px; }
+
+
+        .input-group select, .input-group input[type="text"], .input-group textarea, .input-group input[type="number"] { padding: 5px; border: 1px solid #ccc; border-radius: 3px; width: 100%; box-sizing: border-box; }
+        
+        /* Estilos de campo de Importe NO modificable */
+        input[type="number"][readonly] {
+            background-color: #e9ecef; /* Fondo gris para indicar que está deshabilitado */
+            cursor: default;
+        }
+        
+        /* Estilo de enlaces */
+        .enlaces-articulo-adicionales {
+            margin-top: 10px;
+            padding: 5px;
+            border-top: 1px dashed #c0c0c0;
+        }
+        .letra-input-group {
+             /* Estilos para el input de letra y su enlace (si están visibles) */
+             display: flex;
+             flex-direction: column;
+             flex-basis: 15%; /* Se respeta el 15% para desktop */
+             min-width: 150px;
+        }
+        
+        .detalle-link a, .letra-link-container a, .medida-link-container a {
+             color: #e30052; 
+             font-weight: bold;
+        }
+        .letra-link-container, .medida-link-container { 
+            margin-top: 5px; 
+            padding: 5px;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+        }
+        .medida-link-container a, .letra-link-container a {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+        }
+        .medida-link-container .url-text, .letra-link-container .url-text {
+            font-size: 0.8em;
+            font-weight: normal;
+            display: block;
+            color: #777;
+            word-break: break-all;
+        }
+
+
+        /* TABLAS */
+        .tables-container { 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 20px; 
+            margin-top: 20px; 
+        }
+        .table-wrap { flex-basis: 58%; }
+        .ordered-list-wrap { flex-basis: 42%; }
+        .table-title { background-color: #aed6f1; color: #333; padding: 8px; text-align: center; font-weight: bold; margin-top: 10px; }
+        .table-egresados, .table-ordered { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.9em;}
+        .table-egresados th, .table-egresados td, .table-ordered th, .table-ordered td { border: 1px solid #ddd; padding: 5px; text-align: left; }
+        .table-ordered td:nth-child(3) { text-align: center; background-color: #eaf2f8; font-size: 0.85em; }
+        
+        /* Ajuste específico para inputs y selects dentro de las celdas de las tablas */
+        .table-egresados input, .table-egresados select {
+            width: 100%;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 3px;
+            font-size: 0.9em;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        
+        /* === CORRECCIÓN DE COLORES EN TABLA DE EGRESADOS === */
+        
+        /* 1. Cabeceras (NOMBRES y MEDIDA) -> Fondo Celeste Claro */
+        .table-egresados thead th:nth-child(2), /* Columna NOMBRES */
+        .table-egresados thead th:nth-child(3) { /* Columna MEDIDA */
+            background-color: #eaf2f8; /* Celeste claro */
+        }
+        
+        /* 2. Celdas de NOMBRES (td:nth-child(2)) -> Fondo Blanco */
+        .table-egresados tbody td:nth-child(2) {
+            background-color: white; /* Aseguramos que el fondo de la celda de nombres sea blanco */
+        }
+        
+        /* 3. Input de NOMBRES (Input dentro de td:nth-child(2)) -> Fondo Blanco */
+        .table-egresados tbody td:nth-child(2) input[type="text"] {
+            background-color: white; 
+        }
+        
+        /* 4. Celdas de MEDIDA (td:nth-child(3)) -> Fondo Celeste Claro */
+        .table-egresados tbody td:nth-child(3) {
+            background-color: #eaf2f8; /* Celeste claro */
+        }
+
+        /* 5. Select de MEDIDA (Select dentro de td:nth-child(3)) -> Fondo Celeste Claro */
+        .table-egresados tbody td:nth-child(3) select {
+            background-color: #eaf2f8; 
+        }
+        
+        /* ========================================================================================= */
+        
+        /* ESTILO DEL MENSAJE ANTES DE LA TABLA (AZUL) */
+        .dynamic-table-message {
+            color: #007bff; /* Color azul */
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0 5px 0;
+            padding: 5px;
+            border: 1px dashed #007bff;
+            border-radius: 5px;
+        }
+
+        /* PIE DE PÁGINA (MANTENIDOS) */
+        .footer-summary { margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc; }
+        .summary-row { margin-top: 10px; display: flex; justify-content: flex-end;} 
+        .summary-row p { margin: 0; display: flex; width: 250px; justify-content: space-between; font-weight: bold; }
+        .summary-row input[type="number"] { width: 100px; text-align: right; border: none; font-weight: bold; padding: 0 5px; background: none; }
+        
+        /* BOTÓN DE WHATSAPP */
+        button { background-color: #25D366; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 18px; width: 100%; margin-top: 30px; }
+
+
+        /* === MODIFICACIONES SOLICITADAS EN CSS === */
+
+        /* 1. Texto "ENVIAR COMPROBANTE DE PAGO. GRACIAS!" en AZUL y NEGRITA */
+        /* Apunta al último summary-row que contiene solo ese texto */
+        .footer-summary .summary-row:last-child p {
+            color: #007bff !important; /* Azul vibrante */
+            font-weight: bolder !important; /* Aseguramos que sea muy visible */
+        }
+        
+        /* 2. Botón de FOTOS con texto ROJO y NEGRITA */
+        /* Aplicamos el estilo al botón dentro del <a> en los detalles del artículo */
+        .articulo-detalle a button {
+            color: #dc3545 !important; /* Rojo oscuro (similar a RED) */
+            font-weight: bolder !important; /* Aumentamos el grosor (negrita) */
+        }
+
+        /* === RESPONSIVE DESIGN (MÁRGENES PARA CELULAR) === */
+        @media (max-width: 600px) {
+            .planilla-container { padding: 10px; border: none; box-shadow: none; }
+            
+            /* Ajuste de Cabecera Info */
+            .header-info .row, .header-info p { flex-direction: column; gap: 5px; align-items: flex-start; }
+            .header-info label, .header-info input { width: 100%; }
+            
+            /* Ajuste de Artículos */
+            .item-row, .item-row.top, .item-details-grid { flex-direction: column; gap: 15px; } 
+            
+            .input-group.detail, .input-group.half, .input-group.full, .letra-input-group { 
+                flex-basis: 100% !important; 
+                min-width: 100%; 
+                width: 100%;
+                margin-bottom: 0; 
+            }
+            .articulo-detalle { padding: 5px; }
+            
+            /* Ajuste de Tablas (Para que se apilen verticalmente) */
+            .tables-container { flex-direction: column; gap: 20px; }
+            .table-wrap, .ordered-list-wrap { flex-basis: 100%; }
+            
+            /* Optimización de las celdas de la tabla de egresados para móvil */
+            .table-egresados {
+                display: block; 
+                width: 100%;
+                overflow-x: auto; 
+            }
+            .table-egresados thead, .table-egresados tbody {
+                display: block; 
+            }
+            .table-egresados tr {
+                display: flex; 
+                width: 100%;
+                border-bottom: 1px solid #ddd;
+            }
+            /* AJUSTE DE ANCHO DE COLUMNAS SOLICITADO */
+            .table-egresados th:nth-child(1), .table-egresados td:nth-child(1) { flex-basis: 10%; min-width: 30px; } /* # */
+            .table-egresados th:nth-child(2), .table-egresados td:nth-child(2) { flex-basis: 45%; min-width: 120px; } /* NOMBRES (más ancho) */
+            .table-egresados th:nth-child(3), .table-egresados td:nth-child(3) { flex-basis: 45%; min-width: 120px; } /* MEDIDA (más estrecho que antes) */
+            
+            .table-egresados td {
+                padding: 5px 3px; 
+                display: block; 
+            }
+            
+            .table-egresados input, .table-egresados select {
+                font-size: 0.7em; 
+            }
+
+            /* Ajuste para la tabla de control ordenado (para que fluya normalmente) */
+             .table-ordered {
+                 font-size: 0.85em;
+               }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="planilla-container">
+        
+        <form id="planillaPedidoForm">
+
+            <div class="header-title-split">NOTA DE PEDIDO</div>
+            <div class="subtitle">COMPRA GRUPAL</div> 
+            <div class="header-title-split">SILENTUEVENTO</div>
+            
+            <div class="header-title-split">"UN EGRESADO FELIZ"</div>
+            <div class="header-title-split">WHATSAPP 2235854534</div>
+            <div class="header-social">
+                SEGUINOS EN LAS REDES!!!!
+                <a href="https://www.instagram.com/silentuevento/" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+                <a href="https://web.facebook.com/silentueventoproductospersonalizados" target="_blank" rel="noopener noreferrer">FACEBOOK</a>
+                <a href="https://www.tiktok.com/@silentuevento" target="_blank" rel="noopener noreferrer">TIKTOK</a>
+            </div>
+
+            <div class="header-info">
+                <div class="row">
+                    <div class="input-group-half">
+                        <label for="fecha">FECHA:</label>
+                        <input type="date" id="fecha" name="fecha">
+                    </div>
+                    <div class="input-group-half">
+                        <label for="pedido">Nº DE PEDIDO:</label>
+                        <input type="text" id="pedido" name="pedido" placeholder="COMPLETA EL VENDEDOR">
+                    </div>
+                </div>
+                <p><label for="escuela">ESCUELA:</label><input type="text" id="escuela" name="escuela" required></p>
+            </div>
+
+            <div id="articulos-multiples-container" class="item-details-container">
+                </div>
+            
+            <button type="button" class="add-article-button" onclick="agregarNuevoArticulo()">+ AGREGAR OTRO ARTÍCULO AL PEDIDO</button>
+
+            <div class="dynamic-table-message">
+                NO SE PREOCUPE POR EL ESPACIO, LA TABLA GENERARÁ MAS FILAS/CELDAS AL SEGUIR ESCRIBIENDO
+            </div>
+            <div class="tables-container">
+                <div class="table-wrap">
+                    <div class="table-title">LISTA DE INGRESO (ORDEN ORIGINAL)</div>
+                    <table class="table-egresados">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>NOMBRES</th> 
+                                <th>MEDIDA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="egresados-input-body">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="ordered-list-wrap">
+                    <div class="table-title">CONTROL ORDENADOS DE LA A-Z</div>
+                    <table class="table-ordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre Ordenado</th> 
+                                <th>Medida</th>
+                            </tr>
+                        </thead>
+                        <tbody id="nombres-ordenados-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="footer-summary">
+                <label for="observaciones">OBSERVACIONES:</label>
+                <textarea id="observaciones" name="observaciones" placeholder="ACLARAR AQUÍ CUALQUIER DETALLE A TENER EN CUENTA"></textarea>
+                
+                <div class="summary-row">
+                    <p><label for="fechaEvento">Fecha Evento:</label><input type="date" id="fechaEvento" name="fechaEvento" style="width: 150px;"></p>
+                </div>
+
+                <div class="summary-row">
+                    <p>TOTAL: $<input type="number" id="totalGeneral" name="totalGeneral" placeholder="0" readonly value="0.00"></p>
+                </div>
+                
+                <div class="summary-row">
+                    <p>SEÑA: $<input type="number" id="sena" name="sena" placeholder="0" oninput="calcularRestante()"></p>
+                </div>
+                
+                <div class="summary-row">
+                    <p>RESTAN: $<input type="number" id="restan" name="restan" placeholder="0" readonly></p>
+                </div>
+                
+                <div class="summary-row" style="justify-content: center; margin-top: 5px;">
+                    <p style="width: auto;">ENVIAR COMPROBANTE DE PAGO. GRACIAS!</p>
+                </div>
+                
+            </div>
+
+            <button type="button" onclick="generarMensajeWhatsApp()">Enviar Pedido por WhatsApp</button>
+        </form>
+    </div>
+
+    <template id="articulo-template">
+        <div class="item-details" data-id="ITEM_ID">
+            <div class="item-details-header">
+                <h3 class="articulo-title">Artículo #NUEVO_ID</h3>
+                <button type="button" class="remove-button" onclick="eliminarArticulo(this)">X Quitar Artículo</button>
+            </div>
+            
+            <div class="item-row top">
+                <div class="input-group full">
+                    <label for="articuloPrincipal_NUEVO_ID">Artículo Principal:</label>
+                    <select id="articuloPrincipal_NUEVO_ID" name="articuloPrincipal_NUEVO_ID" onchange="manejarCambioArticulo(this)">
+                        <option value="">-- Seleccionar Artículo --</option>
+                        <option value="BIRRETE">BIRRETE</option>
+                        <option value="BANDA">BANDA</option>
+                        <option value="GALERA">GALERA</option> 
+                        <option value="TAZA">TAZA</option>
+                        <option value="PIN">PIN / PRENDEDOR</option>
+                        <option value="MEDALLAS">MEDALLAS</option>
+                        <option value="BANDERA">BANDERA</option> 
+                        <option value="OTRO">OTRO (ESPECIFICAR)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="detalles-especificos-container">
+                </div>
+            
+            <div class="item-row top" style="margin-top: 10px;">
+                <div class="input-group full letra-input-parent">
+                    <label for="articulo_NUEVO_ID">Descripción Adicional del Artículo:</label>
+                    <textarea id="articulo_NUEVO_ID" name="articulo_NUEVO_ID" placeholder="EGRESADOS/ITOS 2025 MAS NOMBRE O NOMBRE SOLO..."></textarea>
+                </div>
+                
+                <div class="letra-input-group letra-input-container">
+                    <label for="tipoLetra_NUEVO_ID">Tipo de Letra:</label>
+                    <input type="text" id="tipoLetra_NUEVO_ID" name="tipoLetra_NUEVO_ID" value="1,2,3..." placeholder="1,2,3...">
+                </div>
+            </div>
+            
+            <div class="enlaces-articulo-adicionales">
+                 <div class="letra-link-container">
+                    <a href="https://photos.app.goo.gl/WbJWuWVXiFruNpcd8" target="_blank" rel="noopener noreferrer">
+                        ELEGIR TIPO DE LETRA AQUÍ:
+                        <small class="url-text">https://photos.app.goo.gl/WbJWuWVXiFruNpcd8</small>
+                    </a>
+                </div>
+                <div class="medida-link-container" data-tipo-link="medida" style="display: none;">
+                    <a href="https://photos.app.goo.gl/R5ronw33AfYYnHy36" target="_blank" rel="noopener noreferrer">
+                        CÓMO TOMAR MEDIDA DE CABEZA
+                        <small class="url-text">https://photos.app.goo.gl/R5ronw33AfYYnHy36</small>
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="item-row">
+                <div class="input-group half">
+                    <label for="importe_NUEVO_ID">Importe (Unitario):</label>
+                    <input type="number" id="importe_NUEVO_ID" name="importe_NUEVO_ID" placeholder="0.00" step="0.01" value="0.00" readonly oninput="calcularTotalGeneral()">
+                </div>
+                <div class="input-group half">
+                    <label for="cantidad_NUEVO_ID">Cantidad:</label>
+                    <input type="number" id="cantidad_NUEVO_ID" name="cantidad_NUEVO_ID" min="1" value="1" required oninput="calcularTotalGeneral()">
+                </div>
+                <div class="input-group half">
+                    <label for="retira_NUEVO_ID">Retira:</label>
+                    <input type="text" id="retira_NUEVO_ID" name="retira_NUEVO_ID" placeholder="Nombre y Apellido">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <div style="display: none;">
+        
+        <div id="detalle-BIRRETE">
+             <div class="articulo-detalle">
+                <div class="item-details-grid">
+                    <div class="input-group detail">
+                        <label>Color de tela:</label>
+                        <select name="colorBirrete">
+                            <option value="NEGRO (EN STOCK)">NEGRO (EN STOCK)</option>
+                            <option value="AZUL FRANCIA (CONSULTAR)">AZUL FRANCIA (Consultar)</option>
+                            <option value="AZUL MARINO (CONSULTAR)">AZUL MARINO (Consultar)</option>
+                            <option value="ROJO (CONSULTAR)">ROJO (Consultar)</option>
+                            <option value="AMARILLO (CONSULTAR)">AMARILLO (Consultar)</option>
+                            <option value="VERDE FLUO (CONSULTAR)">VERDE FLUO (Consultar)</option>
+                            <option value="AMARILLO FLUO (CONSULTAR)">AMARILLO FLUO (Consultar)</option>
+                            <option value="FUXIA (CONSULTAR)">FUXIA (Consultar)</option>
+                            <option value="NARANJA FLUO (CONSULTAR)">NARANJA FLUO (Consultar)</option>
+                            <option value="OTROS (CONSULTAR)">OTROS (Consultar)</option>
+                        </select>
+                    </div>
+                    <div class="input-group detail">
+                        <label>Color Estampado:</label>
+                        <select name="colorEstampado">
+                            <option value="DORADO (EN STOCK)">DORADO (EN STOCK)</option>
+                            <option value="BLANCO">BLANCO</option>
+                            <option value="PLATEADO GIBRE">PLATEADO GIBRE</option> 
+                            <option value="DORADO GIBRE">DORADO GIBRE</option>
+                            <option value="OTROS (CONSULTAR)">OTROS (CONSULTAR DISPONIBILIDAD)</option>
+                        </select>
+                    </div>
+                    <div class="input-group detail">
+                        <label>Color Borla:</label>
+                        <select name="colorBorla">
+                            <option value="DORADO (EN STOCK)">DORADO (EN STOCK)</option>
+                            <option value="OTROS (CONSULTAR)">OTROS COLORES (CONSULTAR DISPONIBILIDAD)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <a href="https://photos.app.goo.gl/N2LSdKFu2AdPCm5b6" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                    <button type="button" style="width: 100%; padding: 10px 20px; background-color: #c7c8ca; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px;">
+                        HAGA CLIC PARA VER FOTOS DE BIRRETES
+                    </button>
+                </a>
+            </div>
+        </div>
+        
+        <div id="detalle-BANDA">
+            <div class="articulo-detalle">
+                <div class="input-group full">
+                    <label>Detalle de Banda (Tela, Color y Estampado):</label>
+                    <input type="text" name="detalleBanda" placeholder="Tela tropical doble">
+                </div>
+                <div class="input-group detail">
+                    <label>Color Estampado:</label>
+                    <select name="colorEstampado">
+                        <option value="DORADO (EN STOCK)">DORADO (EN STOCK)</option>
+                        <option value="BLANCO">BLANCO</option>
+                        <option value="PLATEADO GIBRE">PLATEADO GIBRE</option> 
+                        <option value="DORADO GIBRE">DORADO GIBRE</option>
+                        <option value="OTROS (CONSULTAR)">OTROS (CONSULTAR DISPONIBILIDAD)</option>
+                    </select>
+                </div>
+                <a href="https://photos.app.goo.gl/AoXQ57iX7DZF3SB68" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                    <button type="button" style="width: 100%; padding: 10px 20px; background-color: #c7c8ca; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px;">
+                        HAGA CLIC PARA VER FOTOS DE BANDAS
+                    </button>
+                </a>
+            </div>
+        </div>
+        
+        <div id="detalle-GALERA">
+            <div class="articulo-detalle">
+                <div class="item-details-grid">
+                    <div class="input-group detail">
+                        <label>Tipo de Tela:</label>
+                        <input type="text" name="tipoTelaGalera" value="YERSEY BONDEADO" placeholder="EJ: YERSEY BONDEADO">
+                    </div>
+                </div>
+                <div class="input-group full">
+                    <label>Detalle/Diseño:</label>
+                    <input type="text" name="disenoGalera" placeholder="ESCUDO, IMAGENES, FRASE, TEXTO...">
+                </div>
+                <a href="https://photos.app.goo.gl/s2iHatsbW3wmFZZn6" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                    <button type="button" style="width: 100%; padding: 10px 20px; background-color: #c7c8ca; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px;">
+                        HAGA CLIC PARA VER FOTOS DE GALERAS
+                    </button>
+                </a>
+            </div>
+        </div>
+        <div id="detalle-TAZA">
+             <div class="articulo-detalle">
+                <div class="input-group full">
+                    <label>Detalle de Taza (Modelo, Diseño y Frase):</label>
+                    <input type="text" name="detalleTaza" placeholder="Taza de polímero">
+                </div>
+                <a href="https://photos.app.goo.gl/tmnCLYzSZtvx96tG8" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                    <button type="button" style="width: 100%; padding: 10px 20px; background-color: #c7c8ca; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px;">
+                        HAGA CLIC PARA VER FOTOS DE TAZAS
+                    </button>
+                </a>
+            </div>
+        </div>
+        
+        <div id="detalle-PIN">
+             <div class="articulo-detalle">
+                <div class="input-group full">
+                    <label>Detalle de Pin/Prendedor (Forma, tamaño, Diseño):</label>
+                    <input type="text" name="detallePin" placeholder="Pin de metal redondo 55mm.">
+                </div>
+                <a href="https://photos.app.goo.gl/UtSPSEemeTnNPEtG9" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                    <button type="button" style="width: 100%; padding: 10px 20px; background-color: #c7c8ca; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px;">
+                        HAGA CLIC PARA VER FOTOS DE PINS
+                    </button>
+                </a>
+            </div>
+        </div>
+        
+        <div id="detalle-MEDALLAS">
+            <div class="articulo-detalle">
+                <div class="input-group full">
+                    <label>Detalle de Medallas:</label>
+                    <textarea name="detalleMedallas" placeholder="Medalla de Polimero sublimada"></textarea>
+                </div>
+                <a href="https://photos.app.goo.gl/s8iMJrT8huGDyYP99" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                    <button type="button" style="width: 100%; padding: 10px 20px; background-color: #c7c8ca; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px;">
+                        HAGA CLIC PARA VER FOTOS DE MEDALLAS
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <div id="detalle-BANDERA">
+            <div class="articulo-detalle">
+                <div class="item-details-grid">
+                    <div class="input-group detail">
+                        <label>Medida y Tipo:</label>
+                        <select name="medidaBandera" onchange="actualizarPrecioBandera(this)">
+                            <option value="60x90cm|10000">Bandera 60 x 90 cm. ($ 10.000)</option>
+                            <option value="150x100cm|14000">Bandera 1,50 x 1 mts. ($ 14.000)</option>
+                            <option value="150x200cm|26000">Bandera 1,50 x 2 mts. ($ 26.000)</option> 
+                            <option value="150x300cm|38000">Bandera 1,50 x 3 mts. ($ 38.000)</option>
+                            <option value="150x400cm|48000">Bandera 1,50 x 4 mts. ($ 48.000)</option>
+                            <option value="Capa35x50cm|5000">Capa Bandera 35 x 50 cm. ($ 5.000)</option>
+                            <option value="Capa50x70cm|8000">Capa Bandera 50 x 70 cm. ($ 8.000)</option>
+                            <option value="OTRA|0">OTRA (Ajustar Precio Manualmente)</option>
+                        </select>
+                    </div>
+                    <div class="input-group detail">
+                        <label>Tipo de Tela:</label>
+                        <input type="text" name="tipoTelaBandera" value="TELA ACETATO BRILLANTE">
+                    </div>
+                </div>
+                <div class="input-group full">
+                    <label>Detalle/Diseño:</label>
+                    <input type="text" name="disenoBandera" placeholder="Escudo,Imagenes,Frase,Texto...">
+                </div>
+                <a href="https://photos.app.goo.gl/H4L1XMqLcgTJwf3V7" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                    <button type="button" style="width: 100%; padding: 10px 20px; background-color: #c7c8ca; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px;">
+                        HAGA CLIC PARA VER FOTOS DE BANDERAS
+                    </button>
+                </a>
+            </div>
+        </div>
+        <div id="detalle-OTRO">
+            <div class="articulo-detalle">
+                <div class="input-group full">
+                    <label>Detalle del Otro Artículo:</label>
+                    <textarea name="detalleOtro" placeholder="Especifique aquí el nombre completo y los detalles del artículo."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- CONSTANTES DE PRECIOS Y ENLACES ---
+        const NUMERO_WHATSAPP = '5492235854534'; 
+        // CAMBIO SOLICITADO: Inicia con 15 filas.
+        const FILAS_INICIALES = 15; 
+        let articuloCounter = 0; // Contador global para IDs únicos
+        
+        // Colores de fondo para rotación (NUEVOS COLORES)
+        const FONDO_COLORS = [
+            'color-0', // #FFDDE1 (Rosa Suave)
+            'color-1', // #D4F1F4 (Azul Claro)
+            'color-2', // #D4EDDA (Verde Menta)
+            'color-3', // #FFF5E1 (Melocotón Pálido)
+            'color-4'  // #E6E6FA (Lavanda Pálida)
+        ];
+
+        // Precios fijos para la mayoría de los artículos
+        const PRECIOS_UNITARIOS_FIJOS = {
+            BIRRETE: 5000.00,
+            BANDA: 5000.00,
+            GALERA: 8000.00, // GALERA AGREGADA
+            TAZA: 2500.00,
+            PIN: 1000.00,
+            MEDALLAS: 1500.00,
+            OTRO: 0.00 
+        };
+        
+        // Precios variables para BANDERA
+        const PRECIOS_BANDERA = {
+            '60x90cm|10000': 10000.00,
+            '150x100cm|14000': 14000.00,
+            '150x200cm|26000': 26000.00, 
+            '150x300cm|38000': 38000.00,
+            '150x400cm|48000': 48000.00,
+            'Capa35x50cm|5000': 5000.00,
+            'Capa50x70cm|8000': 8000.00,
+            'OTRA|0': 0.00
+        };
+
+
+        const ENLACES_FOTOS = {
+            BIRRETE: 'https://photos.app.goo.gl/N2LSdKFu2AdPCm5b6', 
+            BANDA: 'https://photos.app.goo.gl/AoXQ57iX7DZF3SB68', 
+            GALERA: 'https://photos.app.goo.gl/s2iHatsbW3wmFZZn6', // ENLACE GALERA ACTUALIZADO
+            BANDERA: 'https://photos.app.goo.gl/H4L1XMqLcgTJwf3V7',
+            PIN: 'https://photos.app.goo.gl/UtSPSEemeTnNPEtG9', 
+            TAZA: 'https://photos.app.goo.gl/tmnCLYzSZtvx96tG8',
+            MEDALLAS: 'https://photos.app.goo.gl/s8iMJrT8huGDyYP99', 
+            TIPO_LETRA: 'https://photos.app.goo.gl/WbJWuWVXiFruNpcd8',
+            TOMA_MEDIDA: 'https://photos.app.goo.gl/R5ronw33AfYYnHy36',
+        };
+
+        // Referencias principales
+        const articulosContainer = document.getElementById('articulos-multiples-container');
+        const totalGeneralInput = document.getElementById('totalGeneral');
+        const senaInput = document.getElementById('sena');
+        const restanInput = document.getElementById('restan');
+        const egresadosInputBody = document.getElementById('egresados-input-body'); 
+        const nombresOrdenadosBody = document.getElementById('nombres-ordenados-body'); 
+        
+        
+        // --- FUNCIONES DINÁMICAS DE ARTÍCULOS (Mantenidas) ---
+
+        /**
+         * Clona el template de artículo, asigna IDs únicos, aplica color y lo añade al contenedor.
+         */
+        function agregarNuevoArticulo() {
+            articuloCounter++;
+            const newId = articuloCounter;
+            const template = document.getElementById('articulo-template');
+            const clone = template.content.cloneNode(true);
+            const itemDetailsDiv = clone.querySelector('.item-details');
+            
+            // 1. Aplicar color de fondo rotativo
+            const colorIndex = (articuloCounter - 1) % FONDO_COLORS.length;
+            itemDetailsDiv.classList.add(FONDO_COLORS[colorIndex]);
+
+            // 2. Reemplazar todos los NUEVO_ID por el ID único
+            let html = itemDetailsDiv.outerHTML;
+            html = html.replace(/NUEVO_ID/g, newId);
+            
+            // Reinsertar el clon modificado
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            const newItem = tempDiv.firstChild;
+
+            // 3. Asignar título
+            newItem.querySelector('.articulo-title').textContent = `Artículo #${newId}`;
+            newItem.setAttribute('data-id', newId);
+
+            // 4. Re-asignar eventos y asignar listeners
+            const selectArticulo = newItem.querySelector(`[id^="articuloPrincipal_${newId}"]`);
+            selectArticulo.onchange = () => manejarCambioArticulo(selectArticulo);
+            
+            const importeInput = newItem.querySelector(`[id^="importe_${newId}"]`);
+            importeInput.oninput = calcularTotalGeneral; 
+            
+            const cantidadInput = newItem.querySelector(`[id^="cantidad_${newId}"]`);
+            cantidadInput.oninput = calcularTotalGeneral;
+
+            // 5. Añadir el nuevo artículo al contenedor
+            articulosContainer.appendChild(newItem);
+            
+            // Forzamos la carga inicial 
+            manejarCambioArticulo(selectArticulo); 
+        }
+        
+        /**
+         * Actualiza el precio unitario del Bandera basado en la selección de medida
+         * @param {HTMLSelectElement} select - El select de medida de bandera.
+         */
+        function actualizarPrecioBandera(select) {
+             const selectedValue = select.value; 
+             const itemId = select.closest('.item-details').getAttribute('data-id');
+             const importeInput = document.getElementById(`importe_${itemId}`);
+             
+             const precio = PRECIOS_BANDERA[selectedValue] !== undefined 
+                                     ? PRECIOS_BANDERA[selectedValue] 
+                                     : PRECIOS_BANDERA['OTRA|0'];
+                                     
+             importeInput.value = precio.toFixed(2);
+
+             // Si es 'OTRA', permite la modificación manual (quita el readonly)
+             if (selectedValue === 'OTRA|0') {
+                 importeInput.removeAttribute('readonly');
+                 importeInput.style.backgroundColor = 'white';
+             } else {
+                 importeInput.setAttribute('readonly', 'readonly');
+                 importeInput.style.backgroundColor = '#e9ecef';
+             }
+
+             calcularTotalGeneral();
+        }
+
+
+        /**
+         * Elimina un bloque de artículo y recalcula el total.
+         * @param {HTMLElement} button - El botón 'X Quitar Artículo'.
+         */
+        function eliminarArticulo(button) {
+            const itemDetailsDiv = button.closest('.item-details');
+            if (itemDetailsDiv) {
+                itemDetailsDiv.remove();
+                
+                // Después de eliminar, re-aplicamos los colores a los elementos restantes
+                actualizarColoresArticulos();
+                calcularTotalGeneral();
+            }
+        }
+        
+        /**
+         * Re-aplica la rotación de colores después de añadir o eliminar un artículo.
+         */
+        function actualizarColoresArticulos() {
+            const articulos = document.querySelectorAll('.item-details');
+            
+            articulos.forEach((articulo, index) => {
+                // Remover todas las clases de color existentes
+                FONDO_COLORS.forEach(cls => articulo.classList.remove(cls));
+                
+                // Aplicar la nueva clase de color en la secuencia
+                const colorIndex = index % FONDO_COLORS.length;
+                articulo.classList.add(FONDO_COLORS[colorIndex]);
+            });
+            
+            // Actualizar el contador global para que el próximo artículo añadido siga la secuencia
+            articuloCounter = articulos.length;
+        }
+
+
+        /**
+         * Maneja el cambio en el selector de artículo: inserta detalles específicos y ajusta el precio.
+         * @param {HTMLSelectElement} select - El selector de artículo principal.
+         */
+        function manejarCambioArticulo(select) {
+            const itemType = select.value;
+            const articleDiv = select.closest('.item-details');
+            const detailsContainer = articleDiv.querySelector('.detalles-especificos-container');
+            const medidaLinkDiv = articleDiv.querySelector('.medida-link-container');
+            const letraInputContainer = articleDiv.querySelector('.letra-input-container');
+            const letraLinkContainer = articleDiv.querySelector('.letra-link-container');
+
+            const itemId = articleDiv.getAttribute('data-id');
+            const importeInput = document.getElementById(`importe_${itemId}`);
+            
+            // 1. Limpiar detalles anteriores
+            detailsContainer.innerHTML = '';
+            
+            // 2. Insertar detalles específicos (Birrete, Banda, etc.)
+            let templateDetail = document.getElementById(`detalle-${itemType}`);
+            
+            if (itemType === 'OTRO' && !templateDetail) {
+                 templateDetail = document.getElementById('detalle-OTRO');
+            }
+            
+            if (templateDetail) {
+                const clonedDetails = templateDetail.cloneNode(true);
+                clonedDetails.removeAttribute('id'); 
+                clonedDetails.style.display = 'block';
+
+                // Asignar IDs y names únicos a los campos y eventos
+                clonedDetails.querySelectorAll('[name]').forEach(input => {
+                    const originalName = input.getAttribute('name');
+                    input.setAttribute('id', `${originalName}_${itemId}`); 
+                    input.setAttribute('name', `${originalName}_${itemId}`);
+                });
+                
+                // Si es BANDERA, reasignamos el evento onchange al select de medida
+                if (itemType === 'BANDERA') {
+                    const selectMedida = clonedDetails.querySelector('select[name="medidaBandera"]');
+                    if(selectMedida) {
+                        selectMedida.setAttribute('onchange', `actualizarPrecioBandera(this)`);
+                    }
+                }
+
+                detailsContainer.appendChild(clonedDetails);
+            }
+            
+            // 3. Mostrar/Ocultar enlaces e inputs de LETRA y MEDIDA
+            // La letra se aplica a BIRRETE, BANDA, GALERA y OTRO (para especificaciones)
+            const necesitaLetra = itemType === 'BIRRETE' || itemType === 'BANDA' || itemType === 'GALERA' || itemType === 'OTRO';
+            const necesitaMedida = itemType === 'BIRRETE'; // Solo Birrete
+            
+            if (letraInputContainer) {
+                letraInputContainer.style.display = necesitaLetra ? 'flex' : 'none';
+            }
+            if (letraLinkContainer) {
+                letraLinkContainer.style.display = necesitaLetra ? 'block' : 'none';
+            }
+            if (medidaLinkDiv) {
+                medidaLinkDiv.style.display = necesitaMedida ? 'block' : 'none';
+            }
+
+
+            // 4. Ajustar precio unitario automáticamente y gestionar readonly
+            let precio = 0.00;
+            
+            if (itemType === 'BANDERA') {
+                // Para Bandera, usamos el precio de la primera opción por defecto
+                precio = PRECIOS_BANDERA['60x90cm|10000']; 
+                importeInput.setAttribute('readonly', 'readonly');
+                importeInput.style.backgroundColor = '#e9ecef';
+            } else if (PRECIOS_UNITARIOS_FIJOS[itemType] !== undefined) {
+                precio = PRECIOS_UNITARIOS_FIJOS[itemType];
+                importeInput.setAttribute('readonly', 'readonly');
+                importeInput.style.backgroundColor = '#e9ecef';
+            } else {
+                 // Si es "OTRO" o si no tiene precio definido, permitimos edición manual
+                importeInput.removeAttribute('readonly');
+                importeInput.style.backgroundColor = 'white';
+            }
+            
+            importeInput.value = precio.toFixed(2);
+            
+            // 5. Recalcular el total general
+            calcularTotalGeneral();
+        }
+
+        // --- FUNCIONES DE CÁLCULO FINANCIERO (Mantenidas) ---
+        
+        function calcularTotalGeneral() {
+            let total = 0;
+            const articulos = document.querySelectorAll('.item-details');
+            
+            articulos.forEach(articulo => {
+                const itemId = articulo.getAttribute('data-id');
+                
+                const importeInput = document.getElementById(`importe_${itemId}`);
+                const cantidadInput = document.getElementById(`cantidad_${itemId}`);
+                
+                const importe = parseFloat(importeInput?.value) || 0;
+                const cantidad = parseFloat(cantidadInput?.value) || 0;
+                
+                total += importe * cantidad;
+            });
+            
+            totalGeneralInput.value = total.toFixed(2);
+            calcularRestante(); 
+        }
+
+        function calcularRestante() {
+            const total = parseFloat(totalGeneralInput.value) || 0;
+            const sena = parseFloat(senaInput.value) || 0;
+            restanInput.value = (total - sena).toFixed(2);
+        }
+        
+        // --- FUNCIONES DE TABLA DE EGRESADOS (NUEVAS Y MODIFICADAS) ---
+        
+        /**
+         * Crea un elemento TR con inputs para un egresado.
+         * @param {number} num - Número de fila.
+         * @returns {HTMLTableRowElement}
+         */
+        function crearFilaEgresado(num) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${num}</td>
+                <td><input type="text" name="nombre${num}" id="nombre${num}" data-num="${num}"></td>
+                <td>
+                    <select name="birrete${num}" id="birrete${num}">
+                        <option value="">-- Seleccione Medida --</option>
+                        <option value="JARDIN (52 a 55 CM)">JARDIN (52 a 55 CM) - Birrete</option>
+                        <option value="PRIMARIA (56 a 58 CM)">PRIMARIA (56 a 58 CM) - Birrete</option>
+                        <option value="ADULTO (59 a 61 CM)">ADULTO (59 a 61 CM) - Birrete</option>
+                        <option value="JARDIN (8 CM. X 1,50 Mts.)">JARDIN (8 CM. X 1,50 Mts.) - Banda</option>
+                        <option value="PRIMARIA (8 CM. X 1,70 Mts.)">PRIMARIA (8 CM. X 1,70 Mts.) - Banda</option>
+                        <option value="ADULTO (8 CM. X 2Mts.)">ADULTO (8 CM. X 2Mts.) - Banda</option>
+                    </select>
+                </td>
+            `;
+            const nombreInput = tr.querySelector(`#nombre${num}`);
+            const medidaSelect = tr.querySelector(`#birrete${num}`);
+
+            // Asignar eventos de escucha
+            nombreInput.addEventListener('input', actualizarNombresOrdenados);
+            nombreInput.addEventListener('input', verificarUltimaFila); 
+            nombreInput.addEventListener('keydown', manejarEnter);
+            medidaSelect.addEventListener('change', actualizarNombresOrdenados);
+
+            return tr;
+        }
+
+        /**
+         * Inicializa la tabla de egresados con el número de filas iniciales.
+         */
+        function inicializarTablaEgresados() {
+            for (let i = 1; i <= FILAS_INICIALES; i++) {
+                egresadosInputBody.appendChild(crearFilaEgresado(i));
+                nombresOrdenadosBody.appendChild(crearFilaOrdenada(i)); 
+            }
+        }
+        
+        /**
+         * Crea una fila vacía para la tabla de nombres ordenados.
+         * @param {number} num - Número de fila.
+         * @returns {HTMLTableRowElement}
+         */
+        function crearFilaOrdenada(num) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${num}</td><td></td><td></td>`;
+            return tr;
+        }
+
+        /**
+         * Verifica si se ha escrito en el último campo de nombre y agrega una nueva fila si es necesario.
+         */
+        function verificarUltimaFila(event) {
+            const allRows = egresadosInputBody.querySelectorAll('tr');
+            const lastRow = allRows[allRows.length - 1];
+            const lastInput = lastRow.querySelector('input[type="text"]');
+            
+            // Si el texto se ingresó en el último input y tiene contenido
+            if (event.target === lastInput && lastInput.value.trim() !== '') {
+                agregarFilaEgresado();
+            }
+        }
+
+        /**
+         * Agrega una nueva fila de egresado (y en la tabla ordenada).
+         */
+        function agregarFilaEgresado() {
+            const newIndex = egresadosInputBody.querySelectorAll('tr').length + 1;
+            
+            // Agregar a la tabla de ingresos
+            egresadosInputBody.appendChild(crearFilaEgresado(newIndex));
+            
+            // Agregar a la tabla ordenada (inicialmente vacía)
+            nombresOrdenadosBody.appendChild(crearFilaOrdenada(newIndex));
+        }
+
+        /**
+         * Obtiene los datos de egresados de la tabla de ingresos y actualiza la tabla ordenada (A-Z).
+         */
+        function actualizarNombresOrdenados() {
+            const egresadosData = [];
+            const allRows = egresadosInputBody.querySelectorAll('tr');
+            
+            allRows.forEach(row => {
+                const num = parseInt(row.querySelector('td:first-child').textContent);
+                const nombreInput = row.querySelector(`#nombre${num}`);
+                const medidaSelect = row.querySelector(`#birrete${num}`);
+                
+                const nombre = nombreInput ? nombreInput.value.trim() : '';
+                const medida = medidaSelect ? medidaSelect.value : '';
+
+                if (nombre !== '') {
+                    egresadosData.push({
+                        nombre: nombre,
+                        medida: medida
+                    });
+                }
+            });
+
+            
+            const datosOrdenados = egresadosData.sort((a, b) => {
+                const nombreA = a.nombre.toUpperCase();
+                const nombreB = b.nombre.toUpperCase();
+                if (nombreA < nombreB) return -1;
+                if (nombreA > nombreB) return 1;
+                return 0;
+            });
+            
+            const filasOrdenadas = nombresOrdenadosBody.querySelectorAll('tr');
+            const totalFilas = allRows.length;
+
+            // Sincronizar la tabla ordenada con el número total de filas actual
+            while (filasOrdenadas.length < totalFilas) {
+                nombresOrdenadosBody.appendChild(crearFilaOrdenada(filasOrdenadas.length + 1));
+            }
+            // Importante: no borramos filas de la tabla ordenada para que coincida con el # de filas de la tabla de ingreso
+            // Esto asegura que el # de índice en la tabla ordenada no se rompa al rellenar.
+
+            // Llenar los datos
+            const updatedFilasOrdenadas = nombresOrdenadosBody.querySelectorAll('tr');
+            updatedFilasOrdenadas.forEach((fila, i) => {
+                const celdas = fila.getElementsByTagName('td');
+                const celdaNombre = celdas[1];
+                const celdaMedida = celdas[2]; 
+                
+                if (i < datosOrdenados.length) {
+                    celdaNombre.textContent = datosOrdenados[i].nombre;
+                    celdaMedida.textContent = datosOrdenados[i].medida || 'N/A'; 
+                } else {
+                    celdaNombre.textContent = '';
+                    celdaMedida.textContent = '';
+                }
+            });
+        }
+        
+        /**
+         * Maneja la pulsación de Enter para pasar a la siguiente fila.
+         */
+        function manejarEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); 
+                
+                const targetId = event.target.id;
+                
+                if (targetId.startsWith('nombre')) {
+                    const currentRow = parseInt(event.target.getAttribute('data-num'));
+                    const nextRow = currentRow + 1;
+                    
+                    const nextInput = document.getElementById(`nombre${nextRow}`);
+                    
+                    if (nextInput) {
+                        nextInput.focus(); 
+                    } else {
+                        // Si no hay siguiente fila, significa que se agregó una nueva dinámicamente.
+                        // Enfocamos el campo de nombre de la fila recién creada (que será la última).
+                        const allRows = egresadosInputBody.querySelectorAll('tr');
+                        const newRowIndex = allRows.length;
+                        const newRowInput = document.getElementById(`nombre${newRowIndex}`);
+                        if (newRowInput) {
+                             newRowInput.focus();
+                        }
+                    }
+                }
+            }
+        }
+
+
+        // --- FUNCIÓN DE GENERACIÓN DE MENSAJE WHATSAPP (Mantenidas) ---
+
+        function obtenerListaEgresados(ordenar = false) {
+             const egresados = [];
+             const allRows = egresadosInputBody.querySelectorAll('tr');
+             
+             allRows.forEach(row => {
+                 const num = parseInt(row.querySelector('td:first-child').textContent);
+                 const nombreInput = row.querySelector(`#nombre${num}`);
+                 const birreteSelect = row.querySelector(`#birrete${num}`);
+                 
+                 if (nombreInput && nombreInput.value.trim() !== '') {
+                     egresados.push({
+                         nombre: nombreInput.value.trim(), 
+                         birrete: birreteSelect ? birreteSelect.value : '',
+                     });
+                 }
+             });
+
+             if (ordenar) {
+                 return egresados.sort((a, b) => {
+                     const nombreA = a.nombre.toUpperCase();
+                     const nombreB = b.nombre.toUpperCase();
+                     if (nombreA < nombreB) return -1;
+                     if (nombreA > nombreB) return 1;
+                     return 0;
+                 });
+             }
+             return egresados;
+        }
+        
+        /**
+         * Recolecta los detalles específicos de un artículo.
+         */
+        function obtenerDetallesEspecificos(tipo, id) {
+             let detalles = '';
+             const value = (name) => document.getElementById(`${name}_${id}`)?.value || 'N/A';
+
+             switch (tipo) {
+                 case 'BIRRETE':
+                     detalles = `Color Tela: ${value('colorBirrete')}\nColor Estampado: ${value('colorEstampado')}\nColor Borla: ${value('colorBorla')}`;
+                     break;
+                 case 'BANDA':
+                     detalles = `Detalle: ${value('detalleBanda')}\nColor Estampado: ${value('colorEstampado')}`;
+                     break;
+                 case 'GALERA': // CASO GALERA
+                     detalles = `Tipo de Tela: ${value('tipoTelaGalera')}\nDetalle/Diseño: ${value('disenoGalera')}`;
+                     break;
+                 case 'BANDERA':
+                     // Para Bandera, necesitamos el valor del select para el texto completo
+                     const medidaSelect = document.getElementById(`medidaBandera_${id}`);
+                     const medidaTexto = medidaSelect?.options[medidaSelect.selectedIndex].text || 'N/A';
+                     detalles = `Medida/Tipo: ${medidaTexto.split('(')[0].trim()}\nTipo Tela: ${value('tipoTelaBandera')}\nDiseño: ${value('disenoBandera')}`;
+                     break;
+                 case 'TAZA':
+                     detalles = `Detalle: ${value('detalleTaza')}`;
+                     break;
+                 case 'PIN':
+                     detalles = `Detalle: ${value('detallePin')}`;
+                     break;
+                 case 'MEDALLAS':
+                     detalles = `Detalle: ${value('detalleMedallas')}`;
+                     break;
+                 case 'OTRO':
+                     detalles = `Detalle: ${value('detalleOtro')}`;
+                     break;
+             }
+             return detalles;
+        }
+
+
+        /**
+         * Recolecta todos los datos de los bloques de artículos dinámicos.
+         */
+        function obtenerDetallesArticulos() {
+             const articulosData = [];
+             const articulosDivs = document.querySelectorAll('.item-details');
+             
+             articulosDivs.forEach((articuloDiv, index) => {
+                 const id = articuloDiv.getAttribute('data-id');
+                 const itemType = document.getElementById(`articuloPrincipal_${id}`).value;
+                 const cantidad = document.getElementById(`cantidad_${id}`).value;
+                 const importe = document.getElementById(`importe_${id}`).value;
+                 
+                 // Determinamos si los campos de letra son visibles/aplicables
+                 const esArticuloConLetra = itemType === 'BIRRETE' || itemType === 'BANDA' || itemType === 'GALERA' || itemType === 'OTRO';
+                 
+                 const data = {
+                     numero: index + 1,
+                     articuloPrincipal: itemType || 'N/A',
+                     importe: parseFloat(importe).toFixed(2),
+                     cantidad: cantidad,
+                     retira: document.getElementById(`retira_${id}`)?.value || 'N/A',
+                     descripcionAdicional: document.getElementById(`articulo_${id}`)?.value || 'N/A',
+                     tipoLetra: esArticuloConLetra ? (document.getElementById(`tipoLetra_${id}`)?.value || 'N/A') : 'NO APLICA',
+                     detalles: obtenerDetallesEspecificos(itemType, id),
+                     enlaceFoto: ENLACES_FOTOS[itemType] || 'N/A',
+                 };
+                 articulosData.push(data);
+             });
+             return articulosData;
+        }
+
+        function generarMensajeWhatsApp() {
+             if (!document.getElementById('escuela').value.trim()) {
+                 alert('Por favor, ingresa el nombre de la ESCUELA antes de enviar el pedido.');
+                 document.getElementById('escuela').focus();
+                 return;
+             }
+             if (document.querySelectorAll('.item-details').length === 0) {
+                  alert('Por favor, agrega al menos un artículo al pedido.');
+                  return;
+             }
+
+             const dataGeneral = {
+                 fecha: document.getElementById('fecha').value,
+                 pedido: document.getElementById('pedido').value,
+                 escuela: document.getElementById('escuela').value,
+                 totalGeneral: totalGeneralInput.value,
+                 sena: senaInput.value,
+                 restan: restanInput.value,
+                 observaciones: document.getElementById('observaciones').value,
+                 fechaEvento: document.getElementById('fechaEvento').value,
+                 enlaceTipoLetra: ENLACES_FOTOS.TIPO_LETRA,
+                 enlaceTomaMedida: ENLACES_FOTOS.TOMA_MEDIDA,
+             };
+             
+             const articulos = obtenerDetallesArticulos();
+             const egresadosOrdenados = obtenerListaEgresados(true);
+
+             // Bloque de Artículos
+             let articulosBloque = '';
+             articulos.forEach(art => {
+                  const subTotal = (parseFloat(art.importe) * parseFloat(art.cantidad)).toFixed(2);
+                  
+                  // Incluir el link de Medida solo si el artículo lo requiere
+                  let medidaLink = '';
+                  // **Solo Birrete**
+                  if (art.articuloPrincipal === 'BIRRETE') {
+                      medidaLink = `CÓMO TOMAR MEDIDA CABEZA: ${dataGeneral.enlaceTomaMedida}`;
+                  }
+                  
+                  // Incluir la Letra solo si aplica
+                  let tipoLetraInfo = '';
+                  if (art.tipoLetra !== 'NO APLICA') {
+                      tipoLetraInfo = `Tipo de Letra: ${art.tipoLetra}`;
+                  }
+
+                  articulosBloque += `
+*Artículo #${art.numero} (${art.articuloPrincipal})*
+- Precio Unitario: $${art.importe}
+- Cantidad: ${art.cantidad}
+- Sub-Total: $${subTotal}
+${art.detalles}
+Descripción Adicional: ${art.descripcionAdicional}
+${tipoLetraInfo}\n
+Retira: ${art.retira}
+Fotos/Detalles: ${art.enlaceFoto}
+${medidaLink ? medidaLink + '\n' : ''}\n`;
+             });
+             
+             // Lista de Egresados (única para todo el pedido)
+             const listaNombresYMedidas = egresadosOrdenados.map((e, i) => {
+                 const medidaStr = e.birrete && e.birrete !== '-- Seleccione Medida --' ? ` - ${e.birrete}` : '';
+                 return `${i + 1}. ${e.nombre}${medidaStr}`;
+             }).join('\n');
+             
+
+             let mensaje = `*📝 NUEVO PEDIDO MULTI-ARTÍCULO - SILENTUEVENTO*
+Fecha: ${dataGeneral.fecha || 'N/A'}
+Numero de Pedido: ${dataGeneral.pedido || 'N/A'}
+Escuela: ${dataGeneral.escuela || 'N/A'}
+
+*📦 DETALLE DE ARTÍCULOS PEDIDOS*
+${articulosBloque.trim()}
+
+*🧑‍🎓 LISTA DE EGRESADOS (Alfabético) y Medidas*
+Opciones de Letra (General): ${dataGeneral.enlaceTipoLetra}
+${listaNombresYMedidas || 'N/A'}
+
+*💰 RESUMEN FINANCIERO*
+TOTAL: $${dataGeneral.totalGeneral}
+SEÑA: $${dataGeneral.sena}
+RESTAN: $${dataGeneral.restan}
+
+*📋 OBSERVACIONES*
+${dataGeneral.observaciones || 'N/A'}
+
+Fecha Evento: ${dataGeneral.fechaEvento || 'N/A'}
+ENVIAR COMPROBANTE DE PAGO. GRACIAS!
+`;
+
+             const mensajeCodificado = encodeURIComponent(mensaje.trim());
+             const urlWhatsApp = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensajeCodificado}`;
+             window.open(urlWhatsApp, '_blank');
+        }
+
+
+        // --- ASIGNACIÓN DE EVENTOS EN TIEMPO REAL / INICIALIZACIÓN ---
+        
+        // Eventos de cálculo de resumen general
+        senaInput.addEventListener('input', calcularRestante);
+
+        // Inicialización
+        window.onload = () => {
+             // 1. Inicializar la tabla de egresados (con 15 filas)
+             inicializarTablaEgresados();
+             
+             // 2. Agregar el primer bloque de artículo
+             agregarNuevoArticulo(); 
+             
+             // 3. Primeros cálculos
+             actualizarNombresOrdenados(); 
+             calcularTotalGeneral();
+        };
+
+    </script>
+</body>
+</html>
